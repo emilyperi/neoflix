@@ -21,8 +21,24 @@ class MovieDAO:
     """
     # tag::all[]
     def all(self, sort, order, limit=6, skip=0, user_id=None):
-        # TODO: Get list from movies from Neo4j
-        return popular
+        def get_movies(tx, sort, order, limit, skip, user_id):
+            favorites = self.get_user_favorites(tx, user_id)
+            cypher = """
+                    MATCH (m:Movie) 
+                    WHERE exists(m.`{0}`)
+                    RETURN m {{ .*, 
+                                favorite: m.tmdbId IN $favorites
+                                }} AS movie
+                    ORDER BY m.`{0}` {1}
+                    SKIP $skip
+                    LIMIT $limit
+             """.format(sort, order)
+
+            result = tx.run(cypher, limit=limit, skip=skip, user_id=user_id, favorites=favorites)
+            return [row.value("movie") for row in result]
+
+        with self.driver.session() as session:
+            return session.read_transaction(get_movies, sort, order, limit, skip, user_id)
     # end::all[]
 
     """
@@ -100,9 +116,20 @@ class MovieDAO:
     # tag::findById[]
     def find_by_id(self, id, user_id=None):
         # TODO: Find a movie by its ID
-        # MATCH (m:Movie {tmdbId: $id})
+        def get_movie(tx, id, user_id):
+            cypher = """
+                    MATCH (m:Movie {tmdbId: $id})
+                    RETURN m AS movie
+                    """
+            return tx.run(cypher, id=id, user_id=user_id).single()
 
-        return goodfellas
+        with self.driver.session() as session:
+            record = session.read_transaction(get_movie, id=id, user_id=user_id)
+
+        if record is None:
+            raise NotFoundException()
+        print(record["movie"]) 
+        return record["movie"]
     # end::findById[]
 
     """
@@ -132,5 +159,10 @@ class MovieDAO:
     """
     # tag::getUserFavorites[]
     def get_user_favorites(self, tx, user_id):
-        return []
+        cypher = """
+                MATCH (u:User {userId: $user_id})-[:HAS_FAVORITE]->(m:Movie)
+                RETURN m.tmdbId
+                """
+        result = tx.run(cypher, user_id=user_id)
+        return [row.value() for row in result]
     # end::getUserFavorites[]
