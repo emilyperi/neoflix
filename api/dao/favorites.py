@@ -37,8 +37,7 @@ class FavoriteDAO:
             return [row.value("movie") for row in result]
         
         with self.driver.session() as session:
-            favorites = session.read_transaction(get_favorites, user_id=user_id, sort=sort, order=order, limit=limit, skip=skip)
-        return favorites
+            return session.read_transaction(get_favorites, user_id=user_id, sort=sort, order=order, limit=limit, skip=skip)
     # end::all[]
 
 
