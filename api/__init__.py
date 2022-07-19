@@ -6,6 +6,8 @@ from flask.helpers import send_from_directory
 
 from flask_jwt import JWT
 
+from flask_cors import CORS
+
 from api.exceptions.notfound import NotFoundException
 
 from .exceptions.badrequest import BadRequestException
@@ -24,6 +26,8 @@ def create_app(test_config=None):
     # Create and configure app
     static_folder = os.path.join(os.path.dirname(__file__), '..', 'public')
     app = Flask(__name__, static_url_path='/', static_folder=static_folder)
+
+    #CORS(app)
 
     app.config.from_mapping(
         NEO4J_URI=os.getenv('NEO4J_URI'),
@@ -91,7 +95,6 @@ def create_app(test_config=None):
     @app.errorhandler(NotFoundException)
     def handle_not_found_exception(err):
         return {"message": str(err)}, 404
-
 
 
     return app

@@ -28,8 +28,29 @@ class GenreDAO:
         # TODO: Open a new session
         # TODO: Define a unit of work to Get a list of Genres
         # TODO: Execute within a Read Transaction
-
-        return genres
+        def get_genres(tx):
+            cypher = """
+                    MATCH (g:Genre)
+                    WHERE g.name <> '(no genres listed)'
+                    CALL {
+                        WITH g
+                        MATCH (g)<-[:IN_GENRE]-(m:Movie)
+                        WHERE m.imdbRating IS NOT NULL AND m.poster IS NOT NULL
+                        RETURN m.poster AS poster
+                        ORDER BY m.imdbRating DESC LIMIT 1
+                        }
+                    RETURN g {
+                        .*,
+                        movies: size((g)<-[:IN_GENRE]-(:Movie)),
+                        poster: poster
+                        }
+                    ORDER BY g.name ASC
+                    """
+            result = tx.run(cypher)
+            return [row.value(0) for row in result]
+        
+        with self.driver.session() as session:
+            return session.read_transaction(get_genres)
     # end::all[]
 
 

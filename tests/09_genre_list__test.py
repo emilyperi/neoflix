@@ -17,7 +17,7 @@ def test_return_list_of_genres(app):
         assert len(output) is 19
         assert output[0]["name"] == "Action"
         assert output[18]["name"] == "Western"
-
+        print(output)
         print("Here is the answer to the quiz question on the lesson:")
         print("Which genre has the highest movie count?")
         print("Copy and paste the following answer into the text box: \n\n")
