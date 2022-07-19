@@ -1,5 +1,6 @@
 = Flask App Using Neo4j Database
-I completed this tutorial from the Neo4j GraphAcademy. I learned how to create an API interacting with the Neo4j graph database using the query language Cypher. I created routes for HTTP requests that retrieved 'movie' and 'people' nodes, filtered them by attributes, and also created routes for posting and deleting users to the database. Graph databases are better suited than relational databases in some context such as anaylyzing network topology. For information about how to do this tutorial yourself, see below.
+
+I completed this tutorial from the Neo4j GraphAcademy. I learned how to create an API interacting with a Neo4j graph database using the query language Cypher. I created routes for HTTP requests that retrieved 'movie,' 'people' and 'user' nodes, and filtered them by attributes and relationships. I also created routes for posting and deleting users to the database. Graph databases are better suited than relational databases in some contexts such as anaylyzing network topology. For information about how to do this tutorial yourself, see below.
 
 = Building Neo4j Applications with Python
 
